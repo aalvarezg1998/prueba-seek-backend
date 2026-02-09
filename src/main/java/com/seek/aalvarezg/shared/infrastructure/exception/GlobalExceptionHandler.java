@@ -19,14 +19,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException ex, HttpServletRequest request) {
+        HttpStatus httpStatus = ErrorKindToHttpStatusMapper.toHttpStatus(ex.getErrorKind());
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(ex.getStatus().value())
-                .error(ex.getStatus().getReasonPhrase())
+                .status(httpStatus.value())
+                .error(httpStatus.getReasonPhrase())
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
-        return new ResponseEntity<>(error, ex.getStatus());
+        return new ResponseEntity<>(error, httpStatus);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

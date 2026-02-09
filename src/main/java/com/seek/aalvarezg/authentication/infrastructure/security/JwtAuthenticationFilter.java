@@ -1,5 +1,6 @@
 package com.seek.aalvarezg.authentication.infrastructure.security;
 
+import com.seek.aalvarezg.authentication.domain.port.out.TokenProviderPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final TokenProviderPort tokenProviderPort;
 
     @Override
     protected void doFilterInternal(
@@ -37,8 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (jwtService.isTokenValid(token)) {
-            UUID userId = jwtService.extractUserId(token);
+        if (tokenProviderPort.isValid(token)) {
+            UUID userId = tokenProviderPort.extractSubject(token);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userId.toString(), null, Collections.emptyList());
